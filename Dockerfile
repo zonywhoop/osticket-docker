@@ -13,6 +13,7 @@ ENV GIT_REPO=https://github.com/osTicket/osTicket
 COPY bin /bin
 COPY conf/supervisord /etc/supervisor/conf.d/osticket.conf
 COPY conf/msmtp /etc/msmtp.default
+COPY conf/nginx-conf /conf/nginx-default
 
 # Conf files
 RUN touch /etc/msmtp /etc/osticket.secret.txt /etc/cron.d/osticket && \
