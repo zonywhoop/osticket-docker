@@ -1,79 +1,67 @@
-http {
-    include         mime.types;
-    default_type    application/octet-stream;
-    sendfile        on;
-    charset         utf-8;
-    gzip            on;
-    gzip_types      text/plain application/xml text/javascript;
-    gzip_min_length 1000;
+server {
+    listen 80 default;
+    server_name _;
 
-    index index.php index.html index.htm;
+    keepalive_timeout 70;
 
-    server {
-        listen 80 default;
-        server_name _;
+    root /var/www/src/public;
 
-        keepalive_timeout 70;
+    set $path_info "";
 
-        root /var/www/src/public;
-
-        set $path_info "";
-
-        location ~ /include {
-            deny all;
-            return 403;
-        }
-
-        if ($request_uri ~ "^/api(/[^\?]+)") {
-            set $path_info $1;
-        }
-
-        location ~ ^/api/(?:tickets|tasks).*$ {
-            try_files $uri $uri/ /api/http.php?$query_string;
-        }
-
-        if ($request_uri ~ "^/scp/.*\.php(/[^\?]+)") {
-            set $path_info $1;
-        }
-
-        if ($request_uri ~ "^/.*\.php(/[^\?]+)") {
-            set $path_info $1;
-        }
-
-        location ~ ^/scp/ajax.php/.*$ {
-            try_files $uri $uri/ /scp/ajax.php?$query_string;
-        }
-
-        location ~ ^/ajax.php/.*$ {
-            try_files $uri $uri/ /ajax.php?$query_string;
-        }
-
-        location / {
-            try_files $uri $uri/ index.php;
-        }
-
-        location ~ \.php$ {
-            include snippets/fastcgi-php.conf;
-            fastcgi_param   HTTPS $fe_https;
-            fastcgi_pass unix:/run/php/php-fpm.sock;
-        }
-
-	location ~ /\.ht {deny all;}
+    location ~ /include {
+        deny all;
+        return 403;
     }
 
-    # Status server
-    server {
-        listen 8080;
+    if ($request_uri ~ "^/api(/[^\?]+)") {
+        set $path_info $1;
+    }
 
-        location /nginx_status {
-            stub_status on;
-            access_log off;
-        }
+    location ~ ^/api/(?:tickets|tasks).*$ {
+        try_files $uri $uri/ /api/http.php?$query_string;
+    }
 
-        location ~ ^/(status|ping)$ {
-            include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            fastcgi_pass unix:/run/php/php-fpm.sock;
-        }
+    if ($request_uri ~ "^/scp/.*\.php(/[^\?]+)") {
+        set $path_info $1;
+    }
+
+    if ($request_uri ~ "^/.*\.php(/[^\?]+)") {
+        set $path_info $1;
+    }
+
+    location ~ ^/scp/ajax.php/.*$ {
+        try_files $uri $uri/ /scp/ajax.php?$query_string;
+    }
+
+    location ~ ^/ajax.php/.*$ {
+        try_files $uri $uri/ /ajax.php?$query_string;
+    }
+
+    location / {
+        try_files $uri $uri/ index.php;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_param   HTTPS $fe_https;
+        fastcgi_pass unix:/run/php/php-fpm.sock;
+    }
+
+	location ~ /\.ht {deny all;}
+}
+
+# Status server
+server {
+    listen 8080;
+
+    location /nginx_status {
+        stub_status on;
+        access_log off;
+    }
+
+    location ~ ^/(status|ping)$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass unix:/run/php/php-fpm.sock;
     }
 }
