@@ -42,12 +42,13 @@ server {
     }
 
     location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
+        include fastcgi_params;
         fastcgi_param   HTTPS $fe_https;
+        fastcgi_param   PATH_INFO $path_info;
         fastcgi_pass unix:/run/php/php-fpm.sock;
     }
 
-	location ~ /\.ht {deny all;}
+    location ~ /\.ht {deny all;}
 }
 
 # Status server
