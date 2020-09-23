@@ -61,6 +61,8 @@ server {
     }
 
     location ~ ^/(status|ping)$ {
+        fastcgi_index index.php;
+        include fastcgi.conf;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_pass unix:/run/php/php-fpm.sock;
