@@ -3,7 +3,7 @@ MAINTAINER Pooya Parsa <pooya@pi0.ir>
 
 # Install packages
 RUN apt-get update && \
-    apt-get install -yf cron && \
+    apt-get install -yf php7.2-ldap cron && \
     rm -rv /var/lib/apt
 
 # Set upsteam repo
